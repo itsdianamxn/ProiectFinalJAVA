@@ -30,7 +30,7 @@ public class MainFrame extends JFrame {
     ResidentDAO residentDAO;
     HRInstance hrInstance;
     public MainFrame(HRInstance hrInstance) {
-        super("My Drawing Application");
+        super("Hospitals-Residents");
         this.hrInstance = hrInstance;
         init();
     }
@@ -146,6 +146,7 @@ public class MainFrame extends JFrame {
 
             Database.deleteMatchings();
             hrInstance.addResident(resident);
+            hrInstance.makePreferences();
             hrInstance.makePairings();
 
 

@@ -15,6 +15,7 @@ public class Hospital implements Comparable<Hospital> {
     private int hospital_id;
     private String name;
     private int capacity;
+    private int openPos;
     private int grade;
     private List<Specialization> specialization = new ArrayList<>();
     private PriorityQueue<Resident> residentList;
@@ -59,15 +60,16 @@ public class Hospital implements Comparable<Hospital> {
         residentList.remove(resident);
     }
 
-    public void decrementCapacity(){
-        capacity--;
+    public void decrementOpenPos(){
+
+        openPos--;
     }
 
-    public void incrementCapacity(){capacity++;}
+    public void incrementOpenPos(){openPos++;}
 
     @Override
     public int compareTo(Hospital o) {
-        return this.grade - o.grade;
+        return o.grade - this.grade;
     }
 
     @Override

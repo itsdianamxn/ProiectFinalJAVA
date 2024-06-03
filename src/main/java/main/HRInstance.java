@@ -105,7 +105,7 @@ public class HRInstance {
 
     private boolean areHospitalsFilled(){
         for(Hospital hospital : hospitals){
-            if(hospital.getCapacity() > 0){
+            if(hospital.getOpenPos() > 0){
                 return false;
             }
         }
@@ -113,13 +113,16 @@ public class HRInstance {
     }
 
     private Resident getUnassignedResident(){
+        Resident candidate = null;
         for(Resident resident : residents){
             if(!resident.isAssigned() && !resident.getHospitalList().isEmpty()){
-                return resident;
+                if ( candidate == null || candidate.getGrade() < resident.getGrade())
+                {
+                    candidate = resident;
+                }
             }
         }
-
-        return null;
+        return candidate;
     }
 
     public List<Resident> getAssignedResidents(Hospital hospital){
@@ -158,6 +161,7 @@ public class HRInstance {
     }
 
     public void makePairings(){
+
         for(Resident resident : residents)
             resident.setAssigned(false);
         List<Resident> residentsCopy = new ArrayList<>();
@@ -170,17 +174,19 @@ public class HRInstance {
         for (Hospital hospital : hospitals) {
             Hospital copy = new Hospital(hospital);
             hospitalsCopy.add(copy);
+
+            copy.setOpenPos(copy.getCapacity());
+            hospital.setOpenPos(hospital.getCapacity());
         }
         Resident ri = getUnassignedResident();
         while (ri != null && !areHospitalsFilled()) /// while there are unassigned residents
         {
-            PriorityQueue<Hospital> hospitalsCopy1 = new PriorityQueue<>(ri.getHospitalList()); /// create a copy of the resident's preference list
+            PriorityQueue<Hospital> hospitalsCopy1 = new PriorityQueue<>(ri.getHospitalList()); // create a copy of the resident's preference list
             Hospital hj = hospitalsCopy1.poll(); /// get the first hospital from the resident's preference list
-            while(hj!=null && hj.getCapacity()==0)
+            while(hj!=null && hj.getOpenPos()==0)
             {
                 System.out.println(ri.getName() + " cannot be assigned to " + hj + " hospital.");
                 hj = hospitalsCopy1.poll();
-                //ri = getUnassignedResident(); /// get the next unassigned resident
             }
 
             if(hj == null) //all the hospitals in ri's list are full
@@ -190,13 +196,12 @@ public class HRInstance {
                 ri = getUnassignedResident();
                 continue;
             }
-            //ri.removeHospital(hj); /// remove the hospital from the resident's preference list
+            System.out.println("Assigned " + ri + " to hospital " + hj);
             pairings.add(new Matching(hj,ri)); /// add the pair to the list of pairings
             ri.setAssigned(true); /// set the resident as assigned
-            hj.decrementCapacity(); /// decrement the capacity of the hospital
+            hj.decrementOpenPos(); /// decrement the capacity of the hospital
 
             ri = getUnassignedResident();
-
         }
 
         printPairings();
